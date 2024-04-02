@@ -36,4 +36,12 @@ void requestUserInput(T &value, Args &&...args) {
   detail::logHeader("USER INPUT");
   std::cin >> value;
 }
+
+template <typename... Args>
+void requestUserInputLine(std::string &value, Args &&...args) {
+  log("USER INPUT", std::forward<Args>(args)...);
+
+  detail::logHeader("USER INPUT");
+  std::getline(std::cin, value);
+}
 } // namespace utils

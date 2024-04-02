@@ -79,7 +79,7 @@ std::ostream &operator<<(std::ostream &os, UniqueVector<T> &uv) {
   for (auto it = uv.begin(); it != uv.end(); it++) {
     os << it->name;
     if (it != uv.end() - 1)
-      os << " ";
+      os << ", ";
   }
   return os;
 }

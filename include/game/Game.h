@@ -4,6 +4,8 @@
 #include "object/Villain.h"
 #include "utils/IO.h"
 #include "utils/UniqueVector.h"
+#include "yaml.h"
+#include <filesystem>
 #include <unordered_map>
 
 class Game {
@@ -25,13 +27,15 @@ public:
 
   void removePlayer(const std::string &name);
 
-  template <typename... T> void addVillain(T... args) {
-    auto v = std::make_unique<Villain>(std::forward<T>(args)...);
-    utils::log("LOG", "Villain ", v->name, " has been added to the game.");
-    _villains.add(v);
-  }
-
   void removeVillain(const std::string &name);
+
+  void loadExtensions(const std::filesystem::path &path);
+
+  void loadExtension(const std::filesystem::path &path);
+
+  void loadVillains(const std::filesystem::path &path);
+
+  void loadVillain(const YAML::Node &node);
 
   bool launch();
 

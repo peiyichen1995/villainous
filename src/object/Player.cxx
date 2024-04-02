@@ -7,7 +7,7 @@ void Player::chooseVillain(
     UniqueVector<Villain> &villains,
     std::unordered_map<std::string, std::unique_ptr<Villain>> &controls) {
   std::string villain;
-  utils::requestUserInput(
+  utils::requestUserInputLine(
       villain, name, ", please choose from the following villains: ", villains);
   controls[name] = villains.pop(villain);
 }

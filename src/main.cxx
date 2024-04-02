@@ -1,22 +1,21 @@
 #include "game/Game.h"
 #include "object/Player.h"
 #include "object/Villain.h"
+#include "utils/config.h"
+#include <filesystem>
 #include <iostream>
 #include <memory>
 
-int main() {
-
+int main(int argc, char *argv[]) {
   Game g;
+
+  const std::filesystem::path exe(argv[0]);
+  g.loadExtensions(exe.parent_path() / VILLAINOUS_EXTENSION);
 
   g.addPlayer("PangChen");
   g.addPlayer("PangHu");
   g.addPlayer("Rudy");
   g.removePlayer("Rudy");
-
-  g.addVillain("Jafar");
-  g.addVillain("Ursula");
-  g.addVillain("BigFat");
-  g.removeVillain("BigFat");
 
   while (true) {
     try {

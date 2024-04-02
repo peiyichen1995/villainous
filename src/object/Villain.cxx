@@ -1,3 +1,4 @@
 #include "object/Villain.h"
 
-Villain::Villain(const std::string &name) : name(name), power(0) {}
+Villain::Villain(const YAML::Node &node)
+    : name(node["name"].as<std::string>()), power(0) {}
