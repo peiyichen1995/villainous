@@ -4,11 +4,13 @@
 #include "object/Villain.h"
 #include "utils/IO.h"
 #include "utils/UniqueVector.h"
+#include "utils/network.h"
 #include "yaml.h"
+#include <enet/enet.h>
 #include <filesystem>
 #include <unordered_map>
 
-class Game {
+class Client {
 public:
   enum class State {
     // pre-game
@@ -17,13 +19,12 @@ public:
     pre_turn
   };
 
-  Game();
+  Client();
+  ~Client();
 
-  template <typename... T> void addPlayer(T... args) {
-    auto p = std::make_unique<Player>(std::forward<T>(args)...);
-    utils::log("LOG", "Player ", p->name, " joined the game.");
-    _players.add(p);
-  }
+  void connectToServer();
+
+  void loadPlayer(const std::filesystem::path &path);
 
   void removePlayer(const std::string &name);
 
@@ -37,11 +38,13 @@ public:
 
   void loadVillain(const YAML::Node &node);
 
-  bool launch();
+  bool updateFrame();
 
 private:
   UniqueVector<Player> _players;
   UniqueVector<Villain> _villains;
   std::unordered_map<std::string, std::unique_ptr<Villain>> _controls;
   State _state;
+  ENetHost *_client;
+  ENetPeer *_server;
 };

@@ -1,7 +1,8 @@
 #include "object/Player.h"
 #include <iostream>
 
-Player::Player(const std::string &name) : name(name) {}
+Player::Player(const YAML::Node &node)
+    : name(node["name"].as<std::string>()), id(node["id"].as<unsigned int>()) {}
 
 void Player::chooseVillain(
     UniqueVector<Villain> &villains,
