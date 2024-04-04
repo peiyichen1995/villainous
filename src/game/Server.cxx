@@ -22,24 +22,24 @@ Server::~Server() { enet_host_destroy(_server); }
 
 void Server::updateFrame() {
   ENetEvent event;
-  enet_host_service(_server, &event, 0);
+  while (enet_host_service(_server, &event, 0)) {
+    switch (event.type) {
+    case ENET_EVENT_TYPE_CONNECT:
+      utils::log("LOG", "A new client conencted from ",
+                 event.peer->address.host, ":", event.peer->address.port);
+      break;
+    case ENET_EVENT_TYPE_RECEIVE:
+      utils::log("LOG",
+                 std::string(reinterpret_cast<char *>(event.packet->data)));
+      /* Clean up the packet now that we're done using it. */
+      enet_packet_destroy(event.packet);
 
-  switch (event.type) {
-  case ENET_EVENT_TYPE_CONNECT:
-    utils::log("LOG", "A new client conencted from ", event.peer->address.host,
-               ":", event.peer->address.port);
-    break;
-  case ENET_EVENT_TYPE_RECEIVE:
-    utils::log("LOG",
-               std::string(reinterpret_cast<char *>(event.packet->data)));
-    /* Clean up the packet now that we're done using it. */
-    enet_packet_destroy(event.packet);
+      break;
 
-    break;
+    case ENET_EVENT_TYPE_DISCONNECT:
+      throw std::runtime_error("Client disconnected");
 
-  case ENET_EVENT_TYPE_DISCONNECT:
-    throw std::runtime_error("Client disconnected");
-
-  default:;
+    default:;
+    }
   }
 }

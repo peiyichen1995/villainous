@@ -44,4 +44,6 @@ void requestUserInputLine(std::string &value, Args &&...args) {
   detail::logHeader("USER INPUT");
   std::getline(std::cin, value);
 }
+
+std::string getUserInput();
 } // namespace utils

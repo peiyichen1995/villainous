@@ -6,8 +6,10 @@
 #include "utils/UniqueVector.h"
 #include "utils/network.h"
 #include "yaml.h"
+#include <SFML/Window.hpp>
 #include <enet/enet.h>
 #include <filesystem>
+#include <future>
 #include <unordered_map>
 
 class Client {
@@ -41,10 +43,12 @@ public:
   bool updateFrame();
 
 private:
+  State _state;
+  sf::Window _window;
+  std::future<std::string> _get_command;
   UniqueVector<Player> _players;
   UniqueVector<Villain> _villains;
   std::unordered_map<std::string, std::unique_ptr<Villain>> _controls;
-  State _state;
   ENetHost *_client;
   ENetPeer *_server;
 };

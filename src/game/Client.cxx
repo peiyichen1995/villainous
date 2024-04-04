@@ -1,10 +1,14 @@
 #include "game/Client.h"
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <stdexcept>
 
-Client::Client() : _state(State::choose_villain) {
+Client::Client()
+    : _state(State::choose_villain),
+      _window(sf::VideoMode(800, 600), "Villainous"),
+      _get_command(std::async(utils::getUserInput)) {
   utils::log("GAME STATE", "CHOOSE VILLAIN");
   _client = enet_host_create(NULL, 1, 1, 0, 0);
   if (!_client) {
@@ -88,25 +92,62 @@ void Client::loadVillain(const YAML::Node &node) {
 }
 
 bool Client::updateFrame() {
-  switch (_state) {
-
-  case State::choose_villain:
-    for (auto &p : _players)
-      if (!_controls.count(p.name)) {
-        p.chooseVillain(_villains, _controls);
-        return true;
-      }
-    _state = State::pre_turn;
-    utils::log("GAME STATE", "PRE TURN");
-    utils::sendPacket(_server, "Villain picked.");
-    enet_host_flush(_client);
-    return true;
-
-  case State::pre_turn:
-    utils::sendPacket(_server, "Pre turn.");
-    enet_host_flush(_client);
-    return true;
+  sf::Event sf_event;
+  while (_window.pollEvent(sf_event)) {
+    if (sf_event.type == sf::Event::Closed) {
+      _window.close();
+      return false;
+    }
   }
 
-  throw std::invalid_argument("unknown state.");
+  if (_get_command.wait_for(std::chrono::seconds(0)) ==
+      std::future_status::ready) {
+    auto command = _get_command.get();
+    _get_command = std::async(utils::getUserInput);
+    utils::log("COMMAND", command);
+  }
+
+  // switch (_state) {
+  // case State::choose_villain:
+  //   for (auto &p : _players)
+  //     if (!_controls.count(p.name)) {
+  //       p.chooseVillain(_villains, _controls);
+  //       return true;
+  //     }
+  //   _state = State::pre_turn;
+  //   utils::log("GAME STATE", "PRE TURN");
+  //   utils::sendPacket(_server, "Villain picked.");
+  //   enet_host_flush(_client);
+  //   return true;
+
+  // case State::pre_turn:
+  //   utils::sendPacket(_server, "Pre turn.");
+  //   enet_host_flush(_client);
+  //   return true;
+
+  // default:
+  //   throw std::invalid_argument("unknown state.");
+  // }
+
+  ENetEvent enet_event;
+  while (enet_host_service(_client, &enet_event, 0)) {
+    switch (enet_event.type) {
+    case ENET_EVENT_TYPE_CONNECT:
+      throw std::runtime_error("Someone connected. Something's wrong.");
+
+    case ENET_EVENT_TYPE_RECEIVE:
+      utils::log("LOG", std::string(
+                            reinterpret_cast<char *>(enet_event.packet->data)));
+      /* Clean up the packet now that we're done using it. */
+      enet_packet_destroy(enet_event.packet);
+      break;
+
+    case ENET_EVENT_TYPE_DISCONNECT:
+      throw std::runtime_error("Server disconnected");
+
+    default:;
+    }
+  }
+
+  return true;
 }

@@ -51,13 +51,14 @@ int main(int argc, char *argv[]) {
     std::chrono::nanoseconds lag(0ns);
     auto time_start = clock::now();
 
-    while (true) {
+    bool keep_going = true;
+    while (keep_going) {
       auto delta_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
           clock::now() - time_start);
 
       if (delta_time > timestep) {
         try {
-          c.updateFrame();
+          keep_going = c.updateFrame();
         } catch (const std::exception &e) {
           utils::log("ERROR", e.what());
         }
