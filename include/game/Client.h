@@ -1,8 +1,8 @@
 #pragma once
 
+#include "game/Game.h"
 #include "object/Player.h"
 #include "object/Villain.h"
-#include "utils/IO.h"
 #include "utils/UniqueVector.h"
 #include "utils/network.h"
 #include "yaml.h"
@@ -12,7 +12,7 @@
 #include <future>
 #include <unordered_map>
 
-class Client {
+class Client : public Game {
 public:
   enum class State {
     // pre-game
@@ -40,7 +40,7 @@ public:
 
   void loadVillain(const YAML::Node &node);
 
-  bool updateFrame();
+  virtual bool updateFrame() override;
 
 private:
   State _state;

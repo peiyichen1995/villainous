@@ -1,8 +1,6 @@
 #include "game/Server.h"
-#include "utils/IO.h"
-#include <iostream>
 
-Server::Server() {
+Server::Server() : Game() {
   /* Bind the server to the default localhost.     */
   ENetAddress address;
   address.host = ENET_HOST_ANY;
@@ -20,7 +18,7 @@ Server::Server() {
 
 Server::~Server() { enet_host_destroy(_server); }
 
-void Server::updateFrame() {
+bool Server::updateFrame() {
   ENetEvent event;
   while (enet_host_service(_server, &event, 0)) {
     switch (event.type) {
@@ -42,4 +40,5 @@ void Server::updateFrame() {
     default:;
     }
   }
+  return true;
 }

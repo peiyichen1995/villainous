@@ -1,11 +1,12 @@
+#include "game/Game.h"
 #include <enet/enet.h>
 
-class Server {
+class Server : public Game {
 public:
   Server();
   ~Server();
 
-  void updateFrame();
+  virtual bool updateFrame() override;
 
 private:
   ENetHost *_server;

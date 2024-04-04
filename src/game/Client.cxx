@@ -1,12 +1,9 @@
 #include "game/Client.h"
 
 #include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <stdexcept>
 
 Client::Client()
-    : _state(State::choose_villain),
+    : Game(), _state(State::choose_villain),
       _window(sf::VideoMode(800, 600), "Villainous"),
       _get_command(std::async(utils::getUserInput)) {
   utils::log("GAME STATE", "CHOOSE VILLAIN");
@@ -96,6 +93,8 @@ bool Client::updateFrame() {
   while (_window.pollEvent(sf_event)) {
     if (sf_event.type == sf::Event::Closed) {
       _window.close();
+      utils::log("LOG", "Window closed.");
+      utils::log("LOG", "Press Enter to end game.");
       return false;
     }
   }
