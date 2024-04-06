@@ -1,4 +1,5 @@
 #include "game/Server.h"
+#include "utils/network.h"
 
 Server::Server() : Game() {
   /* Bind the server to the default localhost.     */
@@ -6,7 +7,7 @@ Server::Server() : Game() {
   address.host = ENET_HOST_ANY;
   address.port = 8000;
 
-  _server = enet_host_create(&address, 3, 1, 0, 0);
+  _server = enet_host_create(&address, 2, 1, 0, 0);
   if (!_server) {
     std::cerr << "An error occurred while trying to create an ENet server host."
               << std::endl;
@@ -40,5 +41,11 @@ bool Server::updateFrame() {
     default:;
     }
   }
+
+  if (_server->peerCount == _server->connectedPeers) {
+    utils::broadcastPacket(_server, "All players have joined.");
+    enet_host_flush(_server);
+  }
+
   return true;
 }

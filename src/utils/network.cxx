@@ -7,4 +7,11 @@ void sendPacket(ENetPeer *peer, const std::string &message) {
 
   enet_peer_send(peer, 0, packet);
 }
+
+void broadcastPacket(ENetHost *host, const std::string &message) {
+  ENetPacket *packet = enet_packet_create(message.c_str(), message.length(),
+                                          ENET_PACKET_FLAG_RELIABLE);
+
+  enet_host_broadcast(host, 0, packet);
+}
 } // namespace utils
